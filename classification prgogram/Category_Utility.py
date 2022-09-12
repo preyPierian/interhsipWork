@@ -1,7 +1,12 @@
 # def dataservice.storeCategoryData(SKU, Retailer, Value, category)
 # brand, manufacturer, drinkCat1, drinkCat2, drinkCat3, drinkCat4, rtd
 # def adjoinRules(array)
+
+# Changes by preya : 
+#  - Added category object, stores category information and update methods
+
 import re
+from category_obj import category_object
 
 
 #brands
@@ -196,20 +201,20 @@ def joinkeywordsfulllean(arr):
     return full_pattern
 
 def checkTextForCategory(description, retailer_text, scrape, Retailer, SKU, dataservice):
-
     str = description + " " + retailer_text + " " + scrape
-
-    drinkCat1 = ""
-    cat_1_pos = 9999
-    drinkCat2 = ""
-    cat_2_pos = 9999
-    drinkCat3 = ""
-    cat_3_pos = 9999
-    drinkCat4 = ""
-    cat_4_pos = 9999
-    flavoured =  0
-    rtd =  0
-    str = " "+str+" "
+    current_item = category_object(" "+str+" ")
+    
+    drinkCat1 = current_item.drinkCat1
+    cat_1_pos = current_item.cat_1_pos
+    drinkCat2 = current_item.drinkCat2
+    cat_2_pos = current_item.cat_2_pos
+    drinkCat3 = current_item.drinkCat3
+    cat_3_pos = current_item.cat_3_pos
+    drinkCat4 = current_item.drinkCat4
+    cat_4_pos = current_item.cat_4_pos
+    flavoured = current_item.flavoured
+    rtd = current_item.rtd
+    str =  current_item.str
 
 
     if len(re.findall(joinkeywordsfulllean(wine + wine_brands), str, re.IGNORECASE)) > 0:
