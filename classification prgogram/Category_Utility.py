@@ -4,6 +4,7 @@
 
 # Changes by preya : 
 #  - Added category object, stores category information and update methods
+# need to do vlaidation 
 
 import re
 from category_obj import category_object
@@ -202,7 +203,7 @@ def joinkeywordsfulllean(arr):
 
 def checkTextForCategory(description, retailer_text, scrape, Retailer, SKU, dataservice):
     str = description + " " + retailer_text + " " + scrape
-    current_item = category_object(" "+str+" ")
+    current_item = category_object(str)
     
     drinkCat1 = current_item.drinkCat1
     cat_1_pos = current_item.cat_1_pos
@@ -217,13 +218,31 @@ def checkTextForCategory(description, retailer_text, scrape, Retailer, SKU, data
     str =  current_item.str
 
 
-    if len(re.findall(joinkeywordsfulllean(wine + wine_brands), str, re.IGNORECASE)) > 0:
+   
+    if current_item.exsits(wine + wine_brands):
         #dataservice.storeCategoryData(SKU, Retailer, "Wine", "drinkCat1")
-        if re.search(joinkeywordsfulllean(wine + wine_brands), str, re.IGNORECASE).start() < cat_1_pos:
-            drinkCat1 = wine[0]
-            cat_1_pos = re.search(joinkeywordsfulllean(wine + wine_brands), str, re.IGNORECASE).start()
+        if  current_item.first_pos(wine + wine_brands) < current_item.cat_1_pos:
+            current_item.update_category(1,wine[0],wine + wine_brands)
+            
+    if dataservice == "test":
+        return {
+            "drinkcat1":current_item.drinkCat1,
+            "drinkcat2":current_item.drinkCat2,
+            "drinkcat3":current_item.drinkCat3,
+            "drinkcat4":current_item.drinkCat4,
+            "flavoured":current_item.flavoured,
+            "rtd":current_item.rtd
+        }
+    else:
 
-    for one_varietal in varietals:
+        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat1, "drinkCat1")
+        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat2, "drinkCat2")
+        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat3, "drinkCat3")
+        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat4, "drinkCat4")
+        dataservice.storeCategoryData(SKU, Retailer, current_item.flavoured, "flavoured")
+        dataservice.storeCategoryData(SKU, Retailer, current_item.rtd, "rtd")
+
+"""   for one_varietal in varietals:
         if len(re.findall(joinkeywords(one_varietal), str, re.IGNORECASE)) > 0:
             #dataservice.storeCategoryData(SKU, Retailer, "Wine", "drinkCat1")
             if re.search(joinkeywords(one_varietal), str, re.IGNORECASE).start() < cat_1_pos:
@@ -543,21 +562,5 @@ def checkTextForCategory(description, retailer_text, scrape, Retailer, SKU, data
         if re.search(joinkeywords(spirits + spirits_brands), str, re.IGNORECASE).start() < cat_1_pos:
             drinkCat1 = spirits[0]
             cat_1_pos = re.search(joinkeywords(spirits + spirits_brands), str, re.IGNORECASE).start()
-
-    if dataservice == "test":
-        return {
-            "drinkcat1":drinkCat1,
-            "drinkcat2":drinkCat2,
-            "drinkcat3":drinkCat3,
-            "drinkcat4":drinkCat4,
-            "flavoured":flavoured,
-            "rtd":rtd
-        }
-    else:
-
-        dataservice.storeCategoryData(SKU, Retailer, drinkCat1, "drinkCat1")
-        dataservice.storeCategoryData(SKU, Retailer, drinkCat2, "drinkCat2")
-        dataservice.storeCategoryData(SKU, Retailer, drinkCat3, "drinkCat3")
-        dataservice.storeCategoryData(SKU, Retailer, drinkCat4, "drinkCat4")
-        dataservice.storeCategoryData(SKU, Retailer, flavoured, "flavoured")
-        dataservice.storeCategoryData(SKU, Retailer, rtd, "rtd")
+"""
+    

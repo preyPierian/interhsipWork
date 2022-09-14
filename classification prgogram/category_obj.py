@@ -1,5 +1,5 @@
 import re
-import Category_Utility as ca
+#import Category_Utility as ca
 
 class category_object : 
     def __init__(self,str) :
@@ -14,9 +14,37 @@ class category_object :
         self.flavoured =  0
         self.rtd =  0
         self.str = " "+str+" "
+
+    
+    def joinkeywords(arr):
+        full_pattern = ""
+        for word_index in range(len(arr)):
+            if word_index > 0:
+                full_pattern = full_pattern + "|"
+            full_pattern = full_pattern + " " + arr[word_index] + " "#|"+arr[word_index]+" "
+
+        return full_pattern
+
+    def joinkeywordslean(self,arr):
+        full_pattern = ""
+        for word_index in range(len(arr)):
+            if word_index > 0:
+                full_pattern = full_pattern + "|"
+            full_pattern = full_pattern + " " + arr[word_index] + "|"+arr[word_index]+" "
+
+        return full_pattern
+
+    def joinkeywordsfulllean(self,arr):
+        full_pattern = ""
+        for word_index in range(len(arr)):
+            if word_index > 0:
+                full_pattern = full_pattern + "|"
+            full_pattern = full_pattern + arr[word_index]
+
+        return full_pattern
     
     def update_category(self, category_num, category_name, search_query ) :
-        pos = self.find_pos(search_query)
+        pos = self.first_pos(search_query)
         match category_num :
             case 1 :
                 self.drinkCat1 = category_name
@@ -46,11 +74,23 @@ class category_object :
         else :
             self.flavoured = 0
 
-    
-    def find_pos(self,search_query) :
+    def combined_words(self,search_query) :
         combined_words = ""
         if len(search_query) == 1:
-            combined_words = ca.joinkeywordslean(search_query)
+            combined_words = self.joinkeywordslean(search_query)
         else :
-            combined_words = ca.joinkeywordsfulllean(search_query)
-        return(re.search(combined_words, self.str, re.IGNORECASE).start())
+            combined_words = self.joinkeywordsfulllean(search_query)
+        return(combined_words)
+
+
+    def first_pos(self,query) :
+        return(re.search(self.combined_words(query), self.str, re.IGNORECASE).start())
+    
+    def exsits(self,query) :
+        if re.search(self.combined_words(query), self.str, re.IGNORECASE) != None :
+            if (len(re.findall(self.combined_words(query), self.str, re.IGNORECASE))>0):
+                return(True)
+            else:
+                return False
+        else :
+            return False
