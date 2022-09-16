@@ -88,9 +88,6 @@ class category_object :
     
     def exsits(self,query) :
         if re.search(self.combined_words(query), self.str, re.IGNORECASE) != None :
-            if (len(re.findall(self.combined_words(query), self.str, re.IGNORECASE))>0):
-                return(True)
-            else:
-                return False
+            return (len(re.findall(self.combined_words(query), self.str, re.IGNORECASE))>0)
         else :
             return False

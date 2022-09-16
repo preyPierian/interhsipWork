@@ -6,6 +6,7 @@
 #  - Added category object, stores category information and update methods
 # need to do vlaidation 
 
+from genericpath import exists
 import re
 from category_obj import category_object
 
@@ -174,7 +175,267 @@ coffee = ["coffee"]
 flavours = orange + pink + sloe + coffee
 
 
-def joinkeywords(arr):
+def checkTextForCategory(description, retailer_text, scrape, Retailer, SKU, dataservice):
+    str = description + " " + retailer_text + " " + scrape
+    current_item = category_object(str)
+
+    if current_item.exsits(wine + wine_brands) and current_item.first_pos(wine + wine_brands) < current_item.cat_1_pos:
+        current_item.update_category(1,wine[0],wine + wine_brands)
+            
+    for one_varietal in varietals:
+        if current_item.exsits(one_varietal) and current_item.first_pos(one_varietal) < current_item.cat_1_pos:
+            current_item.update_category(1,wine[0],one_varietal)
+    
+    
+    if current_item.exsits(sangria) and current_item.first_pos(sangria) < current_item.cat_1_pos :
+        current_item.update_category(1,wine[0],sangria)
+        current_item.update_category(4,sangria[0],sangria)
+    
+    if current_item.exsits(vodka) :
+        if current_item.first_pos(vodka) < current_item.cat_1_pos:
+            current_item.update_category(1,spirits[0],vodka)
+        if current_item.first_pos(vodka) < current_item.cat_2_pos:
+            current_item.update_category(2,vodka[0],vodka)
+            ##vodka above
+    
+      #wine varietals
+
+    if current_item.drinkCat1 == "Wine":
+        #COLOURS
+
+        if current_item.exsits(white):
+            current_item.update_category(3,white[0],white)
+
+        if current_item.exsits(red):
+            current_item.update_category(3,red[0],red)
+
+        if current_item.exsits(rose):
+            current_item.update_category(3,rose[0],rose)
+
+        #IF IT HAS NOT FOUND A COLOUR ALREADY THEN LOOK FOR COLOURS BY VARIETAL
+        if current_item.drinkCat3 == "":
+            if current_item.exsits(red_varietals):
+                current_item.update_category(3,rose[0],red_varietals)
+
+            if current_item.exsits(white_varietals):
+                current_item.update_category(3,rose[0],white_varietals)
+        #TYPES
+        if current_item.exsits(sparkling):
+            current_item.update_category(2,sparkling[0],sparkling) 
+        else:
+            #dataservice.storeCategoryData(SKU, Retailer, still[0], "drinkCat2")
+            current_item.update_category(2,still[0],"") 
+
+        if current_item.exsits(mulled):
+            current_item.update_category(3,mulled[0],mulled) 
+
+        #varietals
+        for one_varietal in varietals:
+            if current_item.exsits(one_varietal):
+                if  current_item.first_pos(one_varietal) < current_item.cat_4_pos:
+                    current_item.update_category(4,one_varietal[0],one_varietal)
+
+        if current_item.exsits(fortified) :
+            current_item.update_category(1,fortified[0],fortified)
+
+            if current_item.exsits(sherry) :
+                current_item.update_category(2,sherry[0],sherry)
+            elif current_item.exsits(port) :
+                current_item.update_category(2,port[0],port)
+            elif current_item.exsits(muscat) :
+                current_item.update_category(2,muscat[0],muscat)
+
+        if current_item.exsits(sherry):
+            if current_item.first_pos(sherry) < current_item.cat_1_pos and current_item.first_pos(sherry) < current_item.cat_2_pos :
+                current_item.update_category(1,fortified[0],sherry)
+                current_item.update_category(2,sherry[0],sherry)
+                
+        if current_item.exsits(port):
+            if current_item.first_pos(port) < current_item.cat_1_pos and current_item.first_pos(port) < current_item.cat_2_pos :
+                current_item.update_category(1,fortified[0],port)
+                current_item.update_category(2,muscat[0],port)   
+
+        if current_item.exsits(muscat):
+            if current_item.first_pos(muscat) < current_item.cat_1_pos and current_item.first_pos(muscat) < current_item.cat_2_pos :
+                current_item.update_category(1,fortified[0],muscat)
+                current_item.update_category(2,muscat[0],muscat) 
+        
+        #wines above
+    if current_item.exsits(whiskey + whiskey_brands):
+        if current_item.first_pos(whiskey + whiskey_brands) < current_item.cat_1_pos and current_item.first_pos(whiskey + whiskey_brands) < current_item.cat_2_pos :
+            current_item.update_category(1,spirits[0],whiskey + whiskey_brands)
+            current_item.update_category(2,whiskey[0],whiskey + whiskey_brands)             
+
+            if current_item.exsits(malt) :
+                current_item.update_category(3,malt[0],malt)
+                if current_item.cat_3_pos < current_item.cat_1_pos :
+                    current_item.cat_1_pos = current_item.cat_3_pos
+                if current_item.cat_3_pos < current_item.cat_2_pos:
+                    current_item.cat_2_pos = current_item.cat_3_pos
+
+            if current_item.exsits(grain) :
+                current_item.update_category(3,grain[0],grain)
+                if current_item.cat_3_pos < current_item.cat_1_pos :
+                    current_item.cat_1_pos = current_item.cat_3_pos
+                if current_item.cat_3_pos < current_item.cat_2_pos:
+                    current_item.cat_2_pos = current_item.cat_3_pos
+
+  
+
+            if current_item.exsits(blended):
+                current_item.update_category(3,blended[0],blended)
+
+            if current_item.exsits(bourbon):
+                current_item.update_category(3,blended[0],bourbon)
+                current_item.update_category(4,bourbon[0],bourbon)
+                # whiskeys above
+
+
+    if current_item.exsits(gin + gin_brands + ginandtonic) :
+        if current_item.first_pos(gin + gin_brands + ginandtonic) < current_item.cat_1_pos and current_item.first_pos(gin + gin_brands + ginandtonic) < current_item.cat_2_pos :
+            current_item.update_category(1,spirits[0],gin + gin_brands + ginandtonic)
+            current_item.update_category(2,gin[0],gin + gin_brands + ginandtonic) 
+            if current_item.exsits(flavours) :
+                current_item.update_flavour(True)
+        # for flavour in flavours:
+        #     if len(re.findall(joinkeywords(flavour)) > 0:
+        #         #dataservice.storeCategoryData(SKU, Retailer, flavour, "drinkCat4")
+
+    #gins above
+
+    if current_item.exsits(single_malt):
+        if current_item.first_pos(single_malt) < current_item.cat_1_pos and current_item.first_pos(single_malt) < current_item.cat_2_pos :
+            current_item.update_category(1,spirits[0],single_malt)
+            current_item.update_category(2,whiskey[0],single_malt)
+            current_item.update_category(3,single_malt[0],single_malt)
+
+    if current_item.exsits(bourbon):
+            if current_item.first_pos(bourbon) < current_item.cat_1_pos and current_item.first_pos(bourbon) < current_item.cat_2_pos :
+                current_item.update_category(1,spirits[0],bourbon)
+                current_item.update_category(2,whiskey[0],bourbon)
+                current_item.update_category(3,blended[0],bourbon)
+                current_item.update_category(4,bourbon[0],bourbon)
+
+    if current_item.exsits(brandy_cognac) :
+           if current_item.first_pos(brandy_cognac) < current_item.cat_1_pos and current_item.first_pos(brandy_cognac) < current_item.cat_2_pos :
+            current_item.update_category(1,spirits[0],brandy_cognac)
+            current_item.update_category(2,brandy_cognac[0],brandy_cognac)
+
+            if current_item.exsits(cognac):
+                current_item.update_category(3,cognac[0],cognac)
+
+            if current_item.exsits(armagnac):
+                current_item.update_category(3,armagnac[0],armagnac)
+        
+            
+            if current_item.exsits(vs):
+                current_item.update_category(4,vs[0],vs)
+            elif current_item.exsits(vsop):
+                current_item.update_category(4,vsop[0],vsop)
+            elif current_item.exsits(xo):
+                current_item.update_category(4,xo[0],xo)
+
+    if current_item.exsits(tequila_mezcal):
+        if current_item.first_pos(tequila_mezcal) < current_item.cat_1_pos and current_item.first_pos(tequila_mezcal) < current_item.cat_2_pos :
+            current_item.update_category(1,spirits[0],tequila_mezcal)
+            current_item.update_category(2,tequila_mezcal[0],tequila_mezcal)
+            
+
+            if current_item.exsits(gold):
+                current_item.update_category(3,gold[0],gold)
+            elif current_item.exsits(silver):
+                current_item.update_category(3,silver[0],silver)
+            elif current_item.exsits(white):
+                current_item.update_category(3,white[0],white)
+
+        #tequila above, not all defined
+        ##mezcal above
+    if current_item.exsits(rum):
+        if current_item.first_pos(rum) < current_item.cat_1_pos and current_item.first_pos(rum) < current_item.cat_2_pos :
+            current_item.update_category(1,spirits[0],rum)
+            current_item.update_category(2,rum[0],rum)
+
+            if current_item.exsits(spiced):
+             current_item.update_category(3,spiced[0],spiced)
+                #rums above
+
+            # if len(re.findall(joinkeywords(rum_types), str, re.IGNORECASE)) > 0: this neeeds fixing
+            #     drinkCat3 = rum_types[0]
+            #     #rums above
+
+    if current_item.exsits(liqueurs + liqueurs_brands):
+        if current_item.first_pos(liqueurs + liqueurs_brands) < current_item.cat_1_pos and current_item.first_pos(liqueurs + liqueurs_brands) < current_item.cat_2_pos :
+            current_item.update_category(1,spirits[0],liqueurs + liqueurs_brands)
+            current_item.update_category(2,liqueurs[0],liqueurs + liqueurs_brands)
+
+            if  current_item.exsits(cream):
+                current_item.update_category(3,cream[0],cream)
+            else:
+                current_item.drinkCat3 = not_cream[0]
+
+                #Liqueurs above
+
+    if  current_item.exsits(perry) :
+        if current_item.first_pos(perry) < current_item.cat_1_pos and current_item.first_pos(perry) < current_item.cat_2_pos :
+            current_item.update_category(1,perry[0],perry)
+
+    if  current_item.exsits(bitters) :
+        if current_item.first_pos(bitters) < current_item.cat_1_pos :
+            current_item.update_category(1,bitters[0],bitters)
+
+    if current_item.exsits(martini) :
+        if current_item.exsits(cocktail):
+             if current_item.first_pos(martini) < current_item.cat_1_pos and current_item.first_pos(martini) < current_item.cat_2_pos :
+                current_item.update_category(1,fortified[0],martini)
+                current_item.update_category(2,vermouth[0],martini)
+
+    if current_item.exsits(vermouth) :
+            if current_item.first_pos(vermouth) < current_item.cat_2_pos:
+                current_item.update_category(1,fortified[0],vermouth)
+                current_item.update_category(2,vermouth[0],vermouth)
+
+    if current_item.exsits(beer_cider_stout_ale) :
+            if current_item.first_pos(beer_cider_stout_ale) < current_item.cat_1_pos:
+                current_item.update_category(1,beer_cider_stout_ale[0],beer_cider_stout_ale)
+
+    
+
+    if current_item.exsits(cocktail + ginandtonic + spritz + readytodrink + premix + rtd_brands + seltzer):
+        current_item.update_rtd(True)
+
+
+    if current_item.exsits(champagne):
+        #if len(re.findall(joinkeywordsfulllean(champagne), str, re.IGNORECASE)) > 1 or len(re.findall(joinkeywordsfulllean(["Wine & Champagne"]), str, re.IGNORECASE)) < 1:
+            #not an amazon mistake
+            if current_item.first_pos(champagne) < current_item.cat_1_pos:
+                current_item.update_category(1,champagne[0],champagne)
+                current_item.update_category(2,champagne[0],champagne)
+    
+    if current_item.exsits(spirits + spirits_brands):
+        #dataservice.storeCategoryData(SKU, Retailer, "Wine", "drinkCat1")
+        if current_item.first_pos(spirits + spirits_brands) < current_item.cat_1_pos:
+            current_item.update_category(1,spirits[0],spirits + spirits_brands)
+
+    if dataservice == "test":
+        return {
+            "drinkcat1":current_item.drinkCat1,
+            "drinkcat2":current_item.drinkCat2,
+            "drinkcat3":current_item.drinkCat3,
+            "drinkcat4":current_item.drinkCat4,
+            "flavoured":current_item.flavoured,
+            "rtd":current_item.rtd
+        }
+    else:
+
+        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat1, "drinkCat1")
+        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat2, "drinkCat2")
+        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat3, "drinkCat3")
+        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat4, "drinkCat4")
+        dataservice.storeCategoryData(SKU, Retailer, current_item.flavoured, "flavoured")
+        dataservice.storeCategoryData(SKU, Retailer, current_item.rtd, "rtd")
+
+
+""" def joinkeywords(arr):
     full_pattern = ""
     for word_index in range(len(arr)):
         if word_index > 0:
@@ -199,368 +460,4 @@ def joinkeywordsfulllean(arr):
             full_pattern = full_pattern + "|"
         full_pattern = full_pattern + arr[word_index]
 
-    return full_pattern
-
-def checkTextForCategory(description, retailer_text, scrape, Retailer, SKU, dataservice):
-    str = description + " " + retailer_text + " " + scrape
-    current_item = category_object(str)
-    
-    drinkCat1 = current_item.drinkCat1
-    cat_1_pos = current_item.cat_1_pos
-    drinkCat2 = current_item.drinkCat2
-    cat_2_pos = current_item.cat_2_pos
-    drinkCat3 = current_item.drinkCat3
-    cat_3_pos = current_item.cat_3_pos
-    drinkCat4 = current_item.drinkCat4
-    cat_4_pos = current_item.cat_4_pos
-    flavoured = current_item.flavoured
-    rtd = current_item.rtd
-    str =  current_item.str
-
-
-   
-    if current_item.exsits(wine + wine_brands):
-        #dataservice.storeCategoryData(SKU, Retailer, "Wine", "drinkCat1")
-        if  current_item.first_pos(wine + wine_brands) < current_item.cat_1_pos:
-            current_item.update_category(1,wine[0],wine + wine_brands)
-            
-    if dataservice == "test":
-        return {
-            "drinkcat1":current_item.drinkCat1,
-            "drinkcat2":current_item.drinkCat2,
-            "drinkcat3":current_item.drinkCat3,
-            "drinkcat4":current_item.drinkCat4,
-            "flavoured":current_item.flavoured,
-            "rtd":current_item.rtd
-        }
-    else:
-
-        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat1, "drinkCat1")
-        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat2, "drinkCat2")
-        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat3, "drinkCat3")
-        dataservice.storeCategoryData(SKU, Retailer, current_item.drinkCat4, "drinkCat4")
-        dataservice.storeCategoryData(SKU, Retailer, current_item.flavoured, "flavoured")
-        dataservice.storeCategoryData(SKU, Retailer, current_item.rtd, "rtd")
-
-"""   for one_varietal in varietals:
-        if len(re.findall(joinkeywords(one_varietal), str, re.IGNORECASE)) > 0:
-            #dataservice.storeCategoryData(SKU, Retailer, "Wine", "drinkCat1")
-            if re.search(joinkeywords(one_varietal), str, re.IGNORECASE).start() < cat_1_pos:
-                drinkCat1 = wine[0]
-                cat_1_pos = re.search(joinkeywords(one_varietal), str, re.IGNORECASE).start()
-
-    if len(re.findall(joinkeywordsfulllean(sangria), str, re.IGNORECASE)) > 0:
-        #dataservice.storeCategoryData(SKU, Retailer, "Wine", "drinkCat1")
-        if re.search(joinkeywordsfulllean(sangria), str, re.IGNORECASE).start() < cat_1_pos:
-            drinkCat1 = wine[0]
-            drinkCat4 = sangria[0]
-            cat_1_pos = re.search(joinkeywordsfulllean(sangria), str, re.IGNORECASE).start()
-
-    if len(re.findall(joinkeywordsfulllean(vodka), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywordsfulllean(vodka), str, re.IGNORECASE).start() < cat_1_pos:
-            drinkCat1 = spirits[0]
-            cat_1_pos = re.search(joinkeywordsfulllean(vodka), str, re.IGNORECASE).start()
-        if re.search(joinkeywordsfulllean(vodka), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat2 = vodka[0]
-            cat_2_pos = re.search(joinkeywordsfulllean(vodka), str, re.IGNORECASE).start()
-            ##vodka above
-
-
-    #wine varietals
-
-    if drinkCat1 == "Wine":
-        #COLOURS
-
-        if len(re.findall(joinkeywords(white), str, re.IGNORECASE)) > 0:
-            drinkCat3 = white[0]
-            cat_3_pos = re.search(joinkeywords(white), str, re.IGNORECASE).start()
-
-        if len(re.findall(joinkeywords(red), str, re.IGNORECASE)) > 0:
-            if re.search(joinkeywords(red), str, re.IGNORECASE).start() < cat_3_pos:
-                drinkCat3 = red[0]
-                cat_3_pos = re.search(joinkeywords(red), str, re.IGNORECASE).start()
-
-        if len(re.findall(joinkeywords(rose), str, re.IGNORECASE)) > 0:
-            if re.search(joinkeywords(rose), str, re.IGNORECASE).start() < cat_3_pos:
-                drinkCat3 = rose[0]
-                cat_3_pos = re.search(joinkeywords(rose), str, re.IGNORECASE).start()
-
-        #IF IT HAS NOT FOUND A COLOUR ALREADY THEN LOOK FOR COLOURS BY VARIETAL
-        if drinkCat3 == "":
-            if len(re.findall(joinkeywords(red_varietals), str, re.IGNORECASE)) > 0:
-                if re.search(joinkeywords(red_varietals), str, re.IGNORECASE).start() < cat_3_pos:
-                    drinkCat3 = red[0]
-                    cat_3_pos = re.search(joinkeywords(red_varietals), str, re.IGNORECASE).start()
-
-            if len(re.findall(joinkeywords(white_varietals), str, re.IGNORECASE)) > 0:
-                if re.search(joinkeywords(white_varietals), str, re.IGNORECASE).start() < cat_3_pos:
-                    drinkCat3 = white[0]
-                    cat_3_pos = re.search(joinkeywords(white_varietals), str, re.IGNORECASE).start()
-
-        #TYPES
-        if len(re.findall(joinkeywords(sparkling), str, re.IGNORECASE)) > 0:
-            #dataservice.storeCategoryData(SKU, Retailer, sparkling[0], "drinkCat2")
-            drinkCat2 = sparkling[0]
-            cat_2_pos = re.search(joinkeywords(sparkling), str, re.IGNORECASE).start()
-
-        else:
-            #dataservice.storeCategoryData(SKU, Retailer, still[0], "drinkCat2")
-            drinkCat2 = still[0]
-
-
-        if len(re.findall(joinkeywords(mulled), str, re.IGNORECASE)) > 0:
-            #dataservice.storeCategoryData(SKU, Retailer, mulled[0], "drinkCat3")
-            drinkCat3 = mulled[0]
-            cat_3_pos = re.search(joinkeywords(mulled), str, re.IGNORECASE).start()
-
-        #varietals
-        for one_varietal in varietals:
-            if len(re.findall(joinkeywords(one_varietal), str, re.IGNORECASE)) > 0:
-                if re.search(joinkeywords(one_varietal), str, re.IGNORECASE).start() < cat_4_pos:
-                    drinkCat4 = one_varietal[0]
-                    cat_4_pos = re.search(joinkeywords(one_varietal), str, re.IGNORECASE).start()
-
-
-
-
-
-    if len(re.findall(joinkeywordsfulllean(fortified), str, re.IGNORECASE)) > 0:
-        drinkCat1 = fortified[0]
-        cat_1_pos = re.search(joinkeywordsfulllean(fortified), str, re.IGNORECASE).start()
-
-        if len(re.findall(joinkeywords(sherry), str, re.IGNORECASE)) > 0:
-            drinkCat2 = sherry[0]
-            cat_2_pos = re.search(joinkeywords(sherry), str, re.IGNORECASE).start()
-        elif len(re.findall(joinkeywords(port), str, re.IGNORECASE)) > 0:
-            drinkCat2 = port[0]
-            cat_2_pos = re.search(joinkeywords(port), str, re.IGNORECASE).start()
-        elif len(re.findall(joinkeywords(muscat), str, re.IGNORECASE)) > 0:
-            drinkCat2 = muscat[0]
-            cat_2_pos = re.search(joinkeywords(muscat), str, re.IGNORECASE).start()
-
-    if len(re.findall(joinkeywords(sherry), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywords(sherry), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywords(sherry), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = fortified[0]
-            drinkCat2 = sherry[0]
-            cat_2_pos = re.search(joinkeywords(sherry), str, re.IGNORECASE).start()
-            cat_1_pos = re.search(joinkeywords(sherry), str, re.IGNORECASE).start()
-
-    if len(re.findall(joinkeywords(port), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywords(port), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywords(port), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = fortified[0]
-            drinkCat2 = port[0]
-            cat_2_pos = re.search(joinkeywords(port), str, re.IGNORECASE).start()
-            cat_1_pos = re.search(joinkeywords(port), str, re.IGNORECASE).start()
-
-    if len(re.findall(joinkeywords(muscat), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywords(muscat), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywords(muscat), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = fortified[0]
-            drinkCat2 = muscat[0]
-            cat_2_pos = re.search(joinkeywords(muscat), str, re.IGNORECASE).start()
-            cat_1_pos = re.search(joinkeywords(muscat), str, re.IGNORECASE).start()
-
-    #wines above
-
-
-    if len(re.findall(joinkeywords(gin + gin_brands + ginandtonic), str, re.IGNORECASE)) > 0 :
-        if re.search(joinkeywords(gin + gin_brands + ginandtonic), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywords(gin + gin_brands + ginandtonic), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = spirits[0]
-            drinkCat2 = gin[0]
-            cat_1_pos = re.search(joinkeywords(gin + gin_brands + ginandtonic), str, re.IGNORECASE).start()
-            cat_2_pos = re.search(joinkeywords(gin + gin_brands + ginandtonic), str, re.IGNORECASE).start()
-
-            if len(re.findall(joinkeywords(flavours), str, re.IGNORECASE)) > 0 :
-                flavoured =  1
-
-        # for flavour in flavours:
-        #     if len(re.findall(joinkeywords(flavour)) > 0:
-        #         #dataservice.storeCategoryData(SKU, Retailer, flavour, "drinkCat4")
-
-    #gins above
-
-
-    if len(re.findall(joinkeywordsfulllean(whiskey + whiskey_brands) , str, re.IGNORECASE)) > 0 :
-        if re.search(joinkeywordsfulllean(whiskey + whiskey_brands), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywordsfulllean(whiskey + whiskey_brands), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = spirits[0]
-            drinkCat2 = whiskey[0]
-            cat_1_pos = re.search(joinkeywordsfulllean(whiskey + whiskey_brands), str, re.IGNORECASE).start()
-            cat_2_pos = re.search(joinkeywordsfulllean(whiskey + whiskey_brands), str, re.IGNORECASE).start()
-
-            if len(re.findall(joinkeywordslean(malt), str, re.IGNORECASE)) > 0:
-                drinkCat3 = malt[0]
-                cat_3_pos = re.search(joinkeywordslean(malt), str, re.IGNORECASE).start()
-                if cat_3_pos < cat_1_pos:
-                    cat_1_pos = cat_3_pos
-                if cat_3_pos < cat_2_pos:
-                    cat_2_pos = cat_3_pos
-
-            if len(re.findall(joinkeywordslean(grain), str, re.IGNORECASE)) > 0:
-                if re.search(joinkeywordslean(grain), str, re.IGNORECASE).start() < cat_3_pos:
-                    drinkCat3 = grain[0]
-                    cat_3_pos = re.search(joinkeywordslean(grain), str, re.IGNORECASE).start()
-                    if cat_3_pos < cat_1_pos:
-                        cat_1_pos = cat_3_pos
-                    if cat_3_pos < cat_2_pos:
-                        cat_2_pos = cat_3_pos
-
-            if len(re.findall(joinkeywordslean(blended), str, re.IGNORECASE)) > 0:
-                cat_3_pos = re.search(joinkeywordslean(blended), str, re.IGNORECASE).start()
-                drinkCat3 = blended[0]
-            if len(re.findall(joinkeywordslean(bourbon), str, re.IGNORECASE)) > 0:
-                cat_3_pos = re.search(joinkeywordslean(bourbon), str, re.IGNORECASE).start()
-                drinkCat3 = blended[0]
-                cat_4_pos = re.search(joinkeywordslean(bourbon), str, re.IGNORECASE).start()
-                drinkCat4 = bourbon[0]
-                # whiskeys above
-
-    if len(re.findall(joinkeywordsfulllean(single_malt), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywordsfulllean(single_malt), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywordsfulllean(single_malt), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = spirits[0]
-            cat_1_pos = re.search(joinkeywordsfulllean(single_malt), str, re.IGNORECASE).start()
-            drinkCat2 = whiskey[0]
-            cat_2_pos = re.search(joinkeywordsfulllean(single_malt), str, re.IGNORECASE).start()
-            drinkCat3 = single_malt[0]
-            cat_3_pos = re.search(joinkeywordsfulllean(single_malt), str, re.IGNORECASE).start()
-
-    if len(re.findall(joinkeywordsfulllean(bourbon), str, re.IGNORECASE)) > 0 :
-        if re.search(joinkeywordsfulllean(bourbon), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywordsfulllean(bourbon), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = spirits[0]
-            cat_1_pos = re.search(joinkeywordsfulllean(bourbon), str, re.IGNORECASE).start()
-            drinkCat2 = whiskey[0]
-            cat_2_pos = re.search(joinkeywordsfulllean(bourbon), str, re.IGNORECASE).start()
-            drinkCat3 = blended[0]
-            cat_3_pos = re.search(joinkeywordsfulllean(bourbon), str, re.IGNORECASE).start()
-            drinkCat4 = bourbon[0]
-            cat_4_pos = re.search(joinkeywordsfulllean(bourbon), str, re.IGNORECASE).start()
-
-
-
-    if len(re.findall(joinkeywords(brandy_cognac), str, re.IGNORECASE)) > 0 :
-        if re.search(joinkeywords(brandy_cognac), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywords(brandy_cognac), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = spirits[0]
-            cat_1_pos = re.search(joinkeywords(brandy_cognac), str, re.IGNORECASE).start()
-            drinkCat2 = brandy_cognac[0]
-            cat_2_pos = re.search(joinkeywords(brandy_cognac), str, re.IGNORECASE).start()
-
-
-            if len(re.findall(joinkeywords(cognac), str, re.IGNORECASE)) > 0:
-                drinkCat3 = cognac[0]
-
-            if len(re.findall(joinkeywords(armagnac), str, re.IGNORECASE)) > 0:
-                drinkCat3 = armagnac[0]
-
-            if len(re.findall(joinkeywords(vs), str, re.IGNORECASE)) > 0:
-                drinkCat4 = vs[0]
-
-            elif len(re.findall(joinkeywords(vsop), str, re.IGNORECASE)) > 0:
-                drinkCat4 = vsop[0]
-
-            elif len(re.findall(joinkeywords(xo), str, re.IGNORECASE)) > 0:
-                drinkCat4 = xo[0]
-
-
-    if len(re.findall(joinkeywordsfulllean(tequila_mezcal), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywordsfulllean(tequila_mezcal), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywordsfulllean(tequila_mezcal), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = spirits[0]
-            cat_1_pos = re.search(joinkeywordsfulllean(tequila_mezcal), str, re.IGNORECASE).start()
-            drinkCat2 = tequila_mezcal[0]
-            cat_2_pos = re.search(joinkeywordsfulllean(tequila_mezcal), str, re.IGNORECASE).start()
-            if len(re.findall(joinkeywords(gold), str, re.IGNORECASE)) > 0 :
-                drinkCat3 = gold[0]
-                cat_3_pos = re.search(joinkeywords(gold), str, re.IGNORECASE).start()
-
-            elif len(re.findall(joinkeywords(silver), str, re.IGNORECASE)) > 0 :
-                drinkCat3 = silver[0]
-                cat_3_pos = re.search(joinkeywords(silver), str, re.IGNORECASE).start()
-
-            elif len(re.findall(joinkeywords(white), str, re.IGNORECASE)) > 0 :
-                drinkCat3 = white[0]
-                cat_3_pos = re.search(joinkeywords(white), str, re.IGNORECASE).start()
-
-        #tequila above, not all defined
-        ##mezcal above
-
-    if len(re.findall(joinkeywords(rum), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywords(rum), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywords(rum), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = spirits[0]
-            cat_1_pos = re.search(joinkeywords(rum), str, re.IGNORECASE).start()
-            drinkCat2 = rum[0]
-            cat_2_pos = re.search(joinkeywords(rum), str, re.IGNORECASE).start()
-
-            if len(re.findall(joinkeywords(spiced), str, re.IGNORECASE)) > 0:
-                drinkCat3 = spiced[0]
-                cat_3_pos = re.search(joinkeywords(spiced), str, re.IGNORECASE).start()
-                #rums above
-
-            # if len(re.findall(joinkeywords(rum_types), str, re.IGNORECASE)) > 0: this neeeds fixing
-            #     drinkCat3 = rum_types[0]
-            #     #rums above
-
-    if len(re.findall(joinkeywordsfulllean(liqueurs + liqueurs_brands), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywordsfulllean(liqueurs + liqueurs_brands), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywordsfulllean(liqueurs + liqueurs_brands), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = spirits[0]
-            cat_1_pos = re.search(joinkeywordsfulllean(liqueurs + liqueurs_brands), str, re.IGNORECASE).start()
-            drinkCat2 = liqueurs[0]
-            cat_2_pos = re.search(joinkeywordsfulllean(liqueurs + liqueurs_brands), str, re.IGNORECASE).start()
-
-            if len(re.findall(joinkeywords(cream), str, re.IGNORECASE)) > 0:
-                drinkCat3 = cream[0]
-                cat_3_pos = re.search(joinkeywords(cream), str, re.IGNORECASE).start()
-            else:
-                drinkCat3 = not_cream[0]
-
-                #Liqueurs above
-
-    if len(re.findall(joinkeywords(perry), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywords(perry), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywords(perry), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = perry[0]
-            cat_1_pos = re.search(joinkeywords(perry), str, re.IGNORECASE).start()
-
-    if len(re.findall(joinkeywords(bitters), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywords(bitters), str, re.IGNORECASE).start() < cat_1_pos:# and re.search(joinkeywords(bitters), str, re.IGNORECASE).start() < cat_2_pos:
-            drinkCat1 = bitters[0]
-            cat_1_pos = re.search(joinkeywords(bitters), str, re.IGNORECASE).start()
-
-
-    if len(re.findall(joinkeywordsfulllean(martini), str, re.IGNORECASE)) > 0:
-
-        if len(re.findall(joinkeywords(cocktail), str, re.IGNORECASE)) < 1:
-            if re.search(joinkeywordsfulllean(martini), str, re.IGNORECASE).start() < cat_1_pos and re.search(joinkeywordsfulllean(martini), str, re.IGNORECASE).start() < cat_2_pos:
-                drinkCat1 = fortified[0]
-                cat_1_pos = re.search(joinkeywordsfulllean(martini), str, re.IGNORECASE).start()
-                drinkCat2 = vermouth[0]
-                cat_2_pos = re.search(joinkeywordsfulllean(martini), str, re.IGNORECASE).start()
-
-
-    if len(re.findall(joinkeywordsfulllean(vermouth), str, re.IGNORECASE)) > 0 :
-            if re.search(joinkeywordsfulllean(vermouth), str, re.IGNORECASE).start() < cat_2_pos:
-                drinkCat1 = fortified[0]
-                cat_1_pos = re.search(joinkeywordsfulllean(vermouth), str, re.IGNORECASE).start()
-                drinkCat2 = vermouth[0]
-                cat_2_pos = re.search(joinkeywordsfulllean(vermouth), str, re.IGNORECASE).start()
-
-    if len(re.findall(joinkeywords(beer_cider_stout_ale), str, re.IGNORECASE)) > 0:
-        if re.search(joinkeywords(beer_cider_stout_ale), str, re.IGNORECASE).start() < cat_1_pos:
-            drinkCat1 = beer_cider_stout_ale[0]
-            cat_1_pos = re.search(joinkeywords(beer_cider_stout_ale), str, re.IGNORECASE).start()
-
-
-    if len(re.findall(joinkeywords(cocktail + ginandtonic + spritz + readytodrink + premix + rtd_brands + seltzer), description, re.IGNORECASE)) > 0:
-        rtd = 1
-
-    if len(re.findall(joinkeywordsfulllean(champagne), str, re.IGNORECASE)) > 0:
-        if len(re.findall(joinkeywordsfulllean(champagne), str, re.IGNORECASE)) > 1 or len(re.findall(joinkeywordsfulllean(["Wine & Champagne"]), str, re.IGNORECASE)) < 1:
-            #not an amazon mistake
-            if re.search(joinkeywordsfulllean(champagne), str, re.IGNORECASE).start() < cat_1_pos:
-                drinkCat1 = champagne[0]
-                drinkCat2 = champagne[0]
-                cat_1_pos = re.search(joinkeywordsfulllean(champagne), str, re.IGNORECASE).start()
-                cat_2_pos = re.search(joinkeywordsfulllean(champagne), str, re.IGNORECASE).start()
-
-    if len(re.findall(joinkeywords(spirits + spirits_brands), str, re.IGNORECASE)) > 0:
-        #dataservice.storeCategoryData(SKU, Retailer, "Wine", "drinkCat1")
-        if re.search(joinkeywords(spirits + spirits_brands), str, re.IGNORECASE).start() < cat_1_pos:
-            drinkCat1 = spirits[0]
-            cat_1_pos = re.search(joinkeywords(spirits + spirits_brands), str, re.IGNORECASE).start()
-"""
-    
+    return full_pattern """

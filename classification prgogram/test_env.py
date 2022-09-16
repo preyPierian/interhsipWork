@@ -5,8 +5,8 @@ from sql_library import sql_connector
 
 
 input_dp = sql_connector("localhost","root","root","data2")
-
 table_input =  (input_dp.sql_fields_query("sku,item_desc,text,retailer_text","data2.tescoscrape"))
+
 for data in table_input :
     sku = data[0]
     item_desc = data[1]
@@ -19,3 +19,4 @@ for data in table_input :
     if(isinstance(item_desc,str) == False) :
         item_desc = ""
     print(ca.checkTextForCategory(item_desc,retailer_text,text,"Tesco",sku,"test"))
+    print(sku + item_desc)
