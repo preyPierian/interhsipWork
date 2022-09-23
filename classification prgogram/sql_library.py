@@ -14,9 +14,9 @@ class sql_connector :
         self.cursor.execute("CREATE DATABASE IF NOT EXISTS "+database_name+";")
         self.cursor.execute("USE " +database_name)
 
-    def sql_create_table(self,table_name) :
+    def sql_create_table(self,table_name,columns) :
         self.cursor.execute("DROP TABLE IF EXISTS "+ table_name +";")
-        self.cursor.execute("CREATE TABLE "+ table_name +" (word VARCHAR(255), start_index INTEGER(10), end_index INTEGER(10), keyword_id INTEGER AUTO_INCREMENT PRIMARY KEY)")
+        self.cursor.execute("CREATE TABLE "+ table_name +columns)
         
 
     def sql_add_subwords(self,array,table_name):

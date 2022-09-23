@@ -21,6 +21,8 @@ class keyword_extraction :
         search_word = self.search_word
         output = []
 
+        #print(keywords_array)
+        #print(search_word)
         for current_word in keywords_array :
             # If subword found
             current_word   = current_word
@@ -34,7 +36,7 @@ class keyword_extraction :
                     data = (found_word(current_word,substring_index_start,substring_index_end))
                     output.append(data)
                     print(str(substring_index_start) + "," + str(substring_index_end))
-            else : 
-                print("Not found in " + current_word )
-        
+            #else : 
+                #print("Not found in " + current_word )
+    
         self.found_keywords = output

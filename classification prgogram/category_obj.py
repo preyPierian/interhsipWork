@@ -85,6 +85,7 @@ class category_object :
 
     def first_pos(self,query) :
         return(re.search(self.combined_words(query), self.str, re.IGNORECASE).start())
+        
     
     def exsits(self,query) :
         if re.search(self.combined_words(query), self.str, re.IGNORECASE) != None :

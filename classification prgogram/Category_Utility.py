@@ -9,6 +9,8 @@
 from genericpath import exists
 import re
 from category_obj import category_object
+from sql_library import sql_connector
+from keyword_extraction_library import keyword_extraction
 
 
 #brands
@@ -177,7 +179,7 @@ flavours = orange + pink + sloe + coffee
 
 def checkTextForCategory(description, retailer_text, scrape, Retailer, SKU, dataservice):
     str = description + " " + retailer_text + " " + scrape
-    current_item = category_object(str)
+    current_item = category_object(str.lower())
 
     if current_item.exsits(wine + wine_brands) and current_item.first_pos(wine + wine_brands) < current_item.cat_1_pos:
         current_item.update_category(1,wine[0],wine + wine_brands)
@@ -415,6 +417,11 @@ def checkTextForCategory(description, retailer_text, scrape, Retailer, SKU, data
         #dataservice.storeCategoryData(SKU, Retailer, "Wine", "drinkCat1")
         if current_item.first_pos(spirits + spirits_brands) < current_item.cat_1_pos:
             current_item.update_category(1,spirits[0],spirits + spirits_brands)
+
+    for i in range(len(liqueurs_brands)):
+        liqueurs_brands[i] = liqueurs_brands[i].lower()
+
+
 
     if dataservice == "test":
         return {
